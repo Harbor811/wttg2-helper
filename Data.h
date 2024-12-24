@@ -22,16 +22,15 @@ private:
 public:
     // Emplace map vals, set codes, etc
     static void Compile();
-    
-    // For saving, returns whether save was successful
-    static bool Save();
 
-    // For loading save, returns whether load was successful
-    static bool Load();
+    static void ResetCodes();
 
     // Getters && Setters
     static bool GetSetting(string key);
     static void ToggleSetting(string key);
+    static vector<Site*> GetSites();
+    static vector<Code*> GetCodes();
+    static vector<string> GetNotes();
 };
 
 #endif

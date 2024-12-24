@@ -11,7 +11,7 @@ using namespace std;
 vector<Site*> Data::sites;
 vector<Code*> Data::codes = {new Code(), new Code(), new Code(), new Code(), new Code(), new Code(), new Code(), new Code()};
 vector<string> Data::notes;
-map<string, bool> settings;
+map<string, bool> Data::settings;
 
 void Data::Compile()
 {
@@ -129,14 +129,13 @@ void Data::Compile()
     sites.push_back(new Site("DeepVape", "Fake site"));
 }
 
-bool Data::Save()
+void Data::ResetCodes()
 {
-    
-}
-
-bool Data::Load()
-{
-    // Check if Data.txt exists first
+    for (int i = 0; i < 8; i++)
+    {
+        codes.at(i)->hash = "|#" + to_string(i + 1) + "_MISSING|";
+        codes.at(i)->wiki = -1;
+    }
 }
 
 
@@ -149,4 +148,17 @@ bool Data::GetSetting(string key)
 void Data::ToggleSetting(string key)
 {
     settings.at(key) = !settings.at(key);
+}
+
+vector<Site*> Data::GetSites()
+{
+    return sites;
+}
+vector<Code*> Data::GetCodes()
+{
+    return codes;
+}
+vector<string> Data::GetNotes()
+{
+    return notes;
 }

@@ -11,7 +11,7 @@ struct Input
     std::string raw;
     std::string command;
     int val = -1;
-    std::vector<char*> flags = {};
+    std::vector<char> flags = {};
 
     Input(string input)
     {
@@ -40,7 +40,7 @@ struct Input
                 {
                     i++;
                     curChar = tolower(input[i]);
-                    flags.push_back(new string("-" + curChar));
+                    flags.push_back(curChar);
                 } // ADD MULTI DIGIT READS FOR VAL
                 else if (val == -1 && SafeStoi(string(1, curChar)) != -1)
                 {

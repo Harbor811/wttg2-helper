@@ -36,20 +36,12 @@ void ToClipboard(const string &s);
 
 // ARGNUM :: # of arguments (always at least 1 for the .exe)
 // ARGS[] :: each char* points to string of that arg
-int main(int argNum, char* args[])
+int main()
 {
     // Compile Data
     Data::Compile();
-    Data::Load();
     
-    if (argNum > 1) // Command line
-    {
-        CmdLine(argNum, args);
-    }
-    else // Main Loop
-    {   
-        Menu();
-    }
+    Menu();
 
     return 0;
 }
@@ -152,9 +144,9 @@ void Sites()
             {
                 if (Warn("list command prints every single site in the database.\n This will be large!"))
                 {
-                    for (int i = 0; i < sites.size(); i++)
+                    for (int i = 0; i < Data::GetSites().size(); i++)
                     {
-                        Site* curSite = sites.at(i);
+                        Site* curSite = Data::GetSites().at(i);
                         cout << curSite->name << "\n";
                         cout << " " << curSite->info << "\n";
                     }
@@ -162,9 +154,9 @@ void Sites()
             }
             else
             {
-                for (int i = 0; i < sites.size(); i++)
+                for (int i = 0; i < Data::GetSites().size(); i++)
                 {
-                    Site* curSite = sites.at(i);
+                    Site* curSite = Data::GetSites().at(i);
                     if ( (curSite->info.find("Always Open") != -1 && !exA)
                     ||   (curSite->info.find("XX") != -1 && !exT)
                     ||   (curSite->info.find("Fake") != -1 && !exF) )
@@ -203,20 +195,20 @@ void Sites()
                 }
 
                 // "0pen XX:00 - XX:29\n Pages: -index"
-                for(int i = 0 ; i < sites.size(); i++)
+                for(int i = 0 ; i < Data::GetSites().size(); i++)
                 {
-                    if (sites.at(i)->info.find("XX") != -1 &&
-                        SafeStoi(sites.at(i)->info.substr(8, 2)) <= input->val &&
-                        SafeStoi(sites.at(i)->info.substr(16, 2)) >= input->val)
+                    if (Data::GetSites().at(i)->info.find("XX") != -1 &&
+                        SafeStoi(Data::GetSites().at(i)->info.substr(8, 2)) <= input->val &&
+                        SafeStoi(Data::GetSites().at(i)->info.substr(16, 2)) >= input->val)
                     {
-                        if (settings.at("debug_mode"))
+                        if (Data::GetSetting("debug_mode"))
                         {
                             cout << "COMPARISON:\n";
-                            cout << sites.at(i)->info.substr(8, 2) << " <= " << input->val << "\n";
-                            cout << sites.at(i)->info.substr(16, 2) << " >= " << input->val << "\n\n";
+                            cout << Data::GetSites().at(i)->info.substr(8, 2) << " <= " << input->val << "\n";
+                            cout << Data::GetSites().at(i)->info.substr(16, 2) << " >= " << input->val << "\n\n";
                         }
                         
-                        curSite = sites.at(i);
+                        curSite = Data::GetSites().at(i);
                         cout << curSite->name << "\n";
                         cout << " " << curSite->info << "\n";
                     }
@@ -247,11 +239,11 @@ void Sites()
             string newInput = StrToLower(input->command);
 
             cout << "Listing sites...\n\n";
-            for (int i = 0; i < sites.size(); i++)
+            for (int i = 0; i < Data::GetSites().size(); i++)
             {
-                if (StrToLower(sites.at(i)->name).find(newInput) != -1)
+                if (StrToLower(Data::GetSites().at(i)->name).find(newInput) != -1)
                 {
-                    curSite = sites.at(i);
+                    curSite = Data::GetSites().at(i);
                     cout << curSite->name << "\n";
                     cout << " " << curSite->info << "\n";
                 }
@@ -278,10 +270,10 @@ void Notes()
         delete input;
         system("cls");
 
-        if (!notes.empty()) { cout << "User notes\n"; }
-        for(int i = 1; i <= notes.size(); i++)
+        if (!Data::GetNotes().empty()) { cout << "User notes\n"; }
+        for(int i = 1; i <= Data::GetNotes().size(); i++)
         {
-            cout << " " << i << " | " << notes.at(i - 1) << endl;
+            cout << " " << i << " | " << Data::GetNotes().at(i - 1) << endl;
         }
 
         input = GetInput("\\menu\\notes");
@@ -313,12 +305,12 @@ void Notes()
         else if (input->command == "codes")
         {
             bool noCodes = true;
-            for(int i = 0; i < codes.size(); i++)
+            for(int i = 0; i < Data::GetCodes().size(); i++)
             {
-                if (codes.at(i)->hash.find("MISSING") == -1)
+                if (Data::GetCodes().at(i)->hash.find("MISSING") == -1)
                 {
                     noCodes = false;
-                    cout << " " << i + 1 << " | " << codes.at(i)->hash << "\n";
+                    cout << " " << i + 1 << " | " << Data::GetCodes().at(i)->hash << "\n";
                 }
             }
             
@@ -331,12 +323,12 @@ void Notes()
         }
         else if (input->command == "missing")
         {
-            if (settings.at("ignore_wikis"))
+            if (Data::GetSetting("ignore_wikis"))
             {
                 cout << "\tIgnore Wiki is enabled\n\tWould you like to disable it?\n";
                 if (Warn("Ignore Wiki being disabled means you will need to re-enter your code for accurate wiki tracking"))
                 {
-                    settings.at("ignore_wikis") = !settings.at("ignore_wikis");
+                    Data::ToggleSetting("ignore_wikis");
                 }
             }
             else
@@ -345,9 +337,9 @@ void Notes()
                 
                 for (int i = 0; i < 8; i++)
                 {
-                    numWiki1 += (codes.at(i)->wiki == 1);
-                    numWiki2 += (codes.at(i)->wiki == 2);
-                    numWiki3 += (codes.at(i)->wiki == 3);
+                    numWiki1 += (Data::GetCodes().at(i)->wiki == 1);
+                    numWiki2 += (Data::GetCodes().at(i)->wiki == 2);
+                    numWiki3 += (Data::GetCodes().at(i)->wiki == 3);
                 }
                 
                 cout << "\nRemaining Wiki 1 Codes: " << 2 - numWiki1 << "\n";
@@ -364,7 +356,7 @@ void Notes()
             cout << "Compiled code (PASTE INTO TUNNEL)\n";
             for (int i = 0; i < 8; i++)
             {
-                compCode += codes.at(i)->hash;
+                compCode += Data::GetCodes().at(i)->hash;
             }
             cout << "------------------------------------------------------------------------------------------------\n";
             cout << compCode;
@@ -381,14 +373,14 @@ void Notes()
         else if (input->command == "rm")
         {
             int index = input->val;
-            if (index <= 0 || index > notes.size())
+            if (index <= 0 || index > Data::GetNotes().size())
             {
                 cout << index << " not in notes.\n";
                 Wait();
             }
             else
             {
-                notes.erase(notes.begin() + index - 1);
+                Data::GetNotes().erase(Data::GetNotes().begin() + index - 1);
             }
         }
         else if (input->command == "clear")
@@ -396,10 +388,10 @@ void Notes()
             if (Warn("This will erase all notes and codes."))
             {
                 cout << "Clearing notes...\n";
-                notes.clear();
+                Data::GetNotes().clear();
                 Sleep(5);
                 cout << "Clearing codes...\n";
-                ResetCodes();
+                Data::ResetCodes();
                 Sleep(5);
                 cout << "All notes and codes cleared.\n";
                 Wait();
@@ -413,7 +405,7 @@ void Notes()
             for (int i = 0; i < rawInp.length(); i++)
             {
                 //     ----- Check # is 0-8 -----           ----- Check " - " -----          -------- Ensure Hash Len ----------    ---------- Ensure Char # ------------
-                if (settings.at("debug_mode"))
+                if (Data::GetSetting("debug_mode"))
                 {
                     cout << "COMPARISONS:: \n";
                     cout << rawInp[i] << " >= '0' : " << (rawInp[i] >= '0') << "\n";
@@ -425,13 +417,13 @@ void Notes()
                 if (rawInp[i] >= '0' && rawInp[i] <= '8' && rawInp.substr(i+1, 3) == " - " && rawInp.substr(i+4).length() >= 12 && rawInp.substr(i+4, 12).find(' ') == -1)
                 {   // This is a code
                     int codeNum = SafeStoi(string(1, rawInp[i]));
-                    if (settings.at("debug_mode")) { cout << "CODENUM:: " << codeNum << "\n"; }
+                    if (Data::GetSetting("debug_mode")) { cout << "CODENUM:: " << codeNum << "\n"; }
                     
                     string hash = rawInp.substr(i + 4, 12);
                     code = true;
                     i += 4;
 
-                    if (!settings.at("ignore_wikis"))
+                    if (!Data::GetSetting("ignore_wikis"))
                     {
                         cout << " Code detected! Please input Wiki #\n";
 
@@ -446,8 +438,8 @@ void Notes()
 
                         if (input->raw.substr(0,2) != "-1")
                         {
-                            codes.at(codeNum - 1)->hash = hash;
-                            codes.at(codeNum - 1)->wiki = SafeStoi(input->command);
+                            Data::GetCodes().at(codeNum - 1)->hash = hash;
+                            Data::GetCodes().at(codeNum - 1)->wiki = SafeStoi(input->command);
 
                             if (CheckForLastCode())
                             {
@@ -463,14 +455,14 @@ void Notes()
                     }
                     else  // Ignore_Wikis == true
                     {
-                        codes.at(codeNum - 1)->hash = hash;
-                        codes.at(codeNum - 1)->wiki = -1;
+                        Data::GetCodes().at(codeNum - 1)->hash = hash;
+                        Data::GetCodes().at(codeNum - 1)->wiki = -1;
                     }
                 }
             }
             if (!code)
             {
-                notes.push_back(input->raw);
+                Data::GetNotes().push_back(input->raw);
             }
         }
     }
@@ -485,21 +477,21 @@ void Settings()
         system("cls");
         cout << "\tSettings\n\n";
         cout << "\t\t1 | Debug Mode\n";
-        cout << "\t\t  Enabled: " << settings.at("debug_mode") << "\n\n";
+        cout << "\t\t  Enabled: " << Data::GetSetting("debug_mode") << "\n\n";
 
         cout << "\t\t2 | Ignore Wikis\n";
-        cout << "\t\t  Enabled: " << settings.at("ignore_wikis") << "\n";
+        cout << "\t\t  Enabled: " << Data::GetSetting("ignore_wikis") << "\n";
 
         delete input;
         input = GetInput("\\menu\\settings");
 
         if (input->command == "debug" || input->command == "1")
         {
-            settings.at("debug_mode") = !settings.at("debug_mode");
+            Data::ToggleSetting("debug_mode");
         }
         else if (input->command == "ignore" || input->command == "2")
         {
-            settings.at("ignore_wikis") = !settings.at("ignore_wikis");
+            Data::ToggleSetting("ignore_wikis");
         }
         else if (input->command == "help")
         {
@@ -586,7 +578,7 @@ Input* GetInput(const string disp)
 
     Input* userInput = new Input(input);
     
-    if (settings.at("debug_mode"))
+    if (Data::GetSetting("debug_mode"))
     {
         cout << " [CURRENT INPUT]\n";
         cout << "\tRAW: " << userInput->raw;
@@ -644,10 +636,10 @@ bool Warn(const string message)
 
 bool CheckForLastCode()
 {
-    for (int i = 0; i < codes.size(); i++)
+    for (int i = 0; i < Data::GetCodes().size(); i++)
     {
-        if (codes.at(i)->wiki == -1 ||
-            codes.at(i)->hash.find("MISSING") != -1)
+        if (Data::GetCodes().at(i)->wiki == -1 ||
+            Data::GetCodes().at(i)->hash.find("MISSING") != -1)
         {
             return false;
         }
@@ -701,9 +693,4 @@ void ToClipboard(const string& s)
     CloseClipboard();
     
     GlobalFree(hg);
-}
-
-void CmdLine(int argNum, char* args[])
-{
-    
 }

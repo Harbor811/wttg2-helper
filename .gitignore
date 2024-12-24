@@ -1,0 +1,42 @@
+# Better safe than sorry ahh
+# Rider specific files
+.idea/
+
+# Build output
+/x64/
+/build/
+bin/
+obj/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Compiler output
+*.out
+*.exe
+*.o
+*.obj
+*.pdb
+*.idb
+*.ilk
+
+# Dependency management files (e.g., if you're using vcpkg or similar)
+vcpkg/
+
+# Temporary and backup files
+*.swp
+*~.ncb
+*.log
+
+# Rider user-specific settings
+.idea/workspace.xml
+.idea/.idea_modules
+.idea/*.iml
+
+# Debug and Release directories (optional, depending on your configuration)
+Debug/
+Release/
+
+# Ignore .env files (if used for configuration)
+.env
